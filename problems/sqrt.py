@@ -9,7 +9,7 @@ def sqrt(value):
         b = value / a
     return arr
 
-def sqrt(value):
+def sqrt_rec(value):
     arr = []
     def rec(a, b):
         arr.append((a, b))
