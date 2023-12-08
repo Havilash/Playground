@@ -1,14 +1,26 @@
-# https://youtu.be/iSNsgj1OCLA
 import random
+from utils import decorators
 
+success_func = lambda success: 1 if success else 0
+trials = 5000
+generate_boxes = lambda: dict(zip(range(1, 101), random.sample(range(1, 101), 100)))
+
+
+@decorators.with_average(trials, success_func)
 def random_solve():
+    boxes = generate_boxes()
+
     def choose(my_num):
         nums = random.sample(range(1, 101), 50)
         return any(boxes[num] == my_num for num in nums)
 
     return all(choose(i) for i in range(1, 101))
 
+
+@decorators.with_average(trials, success_func)
 def cycle_solve():
+    boxes = generate_boxes()
+
     def choose(my_num):
         num = my_num
         for _ in range(50):
@@ -19,15 +31,10 @@ def cycle_solve():
 
     return all(choose(i) for i in range(1, 101))
 
-trials = 5000
-random_successes = 0
-row_successes = 0
-for _ in range(trials):
-    boxes = dict(zip(range(1, 101), random.sample(range(1, 101), 100)))
-    if random_solve():
-        random_successes += 1
-    if cycle_solve():
-        row_successes += 1
 
-print(f"Random strategy success percentage: {random_successes/trials * 100}%")
-print(f"Cycle strategy success percentage: {row_successes/trials * 100}%")
+# Example usage:
+random_strategy_success_percentage = random_solve()
+cycle_strategy_success_percentage = cycle_solve()
+
+print(f"Random strategy success percentage: {random_strategy_success_percentage:.2f}%")
+print(f"Cycle strategy success percentage: {cycle_strategy_success_percentage:.2f}%")
