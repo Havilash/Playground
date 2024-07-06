@@ -29,7 +29,7 @@ def split_image(img: Image, direction: Direction):
     return img1, img2
 
 
-def get_images(url="https://picsum.photos/800/800?random=1"):
+def get_images_url(url="https://picsum.photos/800/800?random=1"):
     response = requests.get(url)
     try:
         img = Image.open(BytesIO(response.content))
@@ -40,6 +40,13 @@ def get_images(url="https://picsum.photos/800/800?random=1"):
         return img, (img1, img2)
     except IOError:
         print("The received content is not a valid image.")
+
+
+def get_image_file(file_path):
+    img = Image.open(file_path)
+    direction = Direction.HORIZONTAL if random.random() > 0.5 else Direction.VERTICAL
+    img1, img2 = split_image(img, direction)
+    return img, (img1, img2)
 
 
 def get_image_sides(img):
@@ -79,7 +86,7 @@ def concat_images(original_img1, original_img2):
 
 
 def main():
-    img, split_imgs = get_images()
+    img, split_imgs = get_images_url()
     split_imgs = list(split_imgs)
     # random.shuffle(split_imgs)
     concat_img = concat_images(*split_imgs)
