@@ -1,10 +1,12 @@
 import random
-from PIL import Image
-import requests
 from enum import Enum
-import matplotlib.pyplot as plt
 from io import BytesIO
+
+import matplotlib.pyplot as plt
 import numpy as np
+import requests
+from matplotlib import widgets
+from PIL import Image
 
 
 class Direction(Enum):
@@ -42,13 +44,6 @@ def get_images_url(url="https://picsum.photos/800/800?random=1"):
         print("The received content is not a valid image.")
 
 
-def get_image_file(file_path):
-    img = Image.open(file_path)
-    direction = Direction.HORIZONTAL if random.random() > 0.5 else Direction.VERTICAL
-    img1, img2 = split_image(img, direction)
-    return img, (img1, img2)
-
-
 def get_image_sides(img):
     sides = {
         "north": img[0, :],
@@ -59,9 +54,6 @@ def get_image_sides(img):
     return sides
 
 
-from PIL import Image
-
-
 def concat_images(original_img1, original_img2):
     img1 = np.array(original_img1.convert("RGB"))
     img2 = np.array(original_img2.convert("RGB"))
@@ -69,7 +61,6 @@ def concat_images(original_img1, original_img2):
     img1_sides = get_image_sides(img1)
     img2_sides = get_image_sides(img2)
 
-    print((np.sum(img1_sides["south"] - img2_sides["north"], axis=1) ** 2).shape)
     horizontal_difference = np.sum(
         np.sqrt(np.sum((img1_sides["south"] - img2_sides["north"]) ** 2, axis=1))
     )
@@ -85,13 +76,12 @@ def concat_images(original_img1, original_img2):
     return concat_img
 
 
-def main():
+def plot(event=None):
     img, split_imgs = get_images_url()
     split_imgs = list(split_imgs)
-    # random.shuffle(split_imgs)
     concat_img = concat_images(*split_imgs)
 
-    plt.figure(figsize=(8, 8))
+    plt.clf()
 
     plt.subplot(3, 2, 1)
     plt.imshow(img, cmap="gray")
@@ -113,7 +103,18 @@ def main():
     plt.title("Concatenated Image")
     plt.axis(False)
 
-    plt.tight_layout()
+    # plt.tight_layout()
+    plt.draw()
+
+
+def main():
+    fig = plt.figure(figsize=(8, 8))
+
+    ax_button = plt.axes([0.05, 0.05, 0.1, 0.05])
+    button = widgets.Button(ax_button, "Reload")
+    button.on_clicked(plot)
+
+    plot()
     plt.show()
 
 
